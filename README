@@ -1,1 +1,8 @@
 Hi
+
+This is, as of now, a very dirty, hackish implementation of something like attachment_fu_fixtures for Thoughtbot's Paperclip plugin.
+
+If for some reason you came across this, you probably shouldn't use it unless you're willing to basically write it yourself. I just needed this for a hackish project so I put little time into it.
+
+Inspiration and code from:
+http://github.com/mynyml/attachment_fu_fixtures/tree/master
