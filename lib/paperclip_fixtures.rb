@@ -2,16 +2,25 @@ module PaperclipFixtures
   
   def insert_fixture_with_attachment(fixture, table_name)
     if klass = attachment_model?(fixture)
+      # puts "klass: #{klass}"
       fixture = fixture.to_hash
-      key = fixture.keys.grep(/file_for_/)
+      key = fixture.keys.grep(/file_for_/).first
+      # puts "found key: #{key}"
       full_path = fixture.delete(key)
+      # puts "full path: #{full_path}"
       attachment_field = key.gsub(/file_for_(.*)/, '\1')
+      # puts "field: #{attachment_field}"
       
       file = File.new(full_path)
       
-      temp_model = klass.new
+      temp_model = klass.new()
+      temp_model.id = fixture['id']
+      # puts "fixtures id is: #{temp_model.id}"
       set_method = "#{attachment_field}=".to_sym
+      # set the data
       temp_model.send(set_method, file)
+      # write out the files
+      temp_model.save_attached_files
       fixture = Fixture.new(temp_model.attributes.update(fixture), klass)
     end
     insert_fixture_without_attachment(fixture, table_name)
@@ -38,9 +47,8 @@ module PaperclipFixtures
       klass = k.camelize.constantize
     end
 
-    fixture_includes_file_for = fixture.keys.grep(/file_for_/)
-
-    (klass && fixture_includes_file_for) ? klass : nil
+    fixture_mising_file_for = fixture.to_hash.keys.grep(/file_for_/).empty?
+    
+    (klass && !fixture_mising_file_for) ? klass : nil
   end
-  
 end
