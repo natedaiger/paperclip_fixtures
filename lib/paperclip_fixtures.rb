@@ -26,7 +26,8 @@ module PaperclipFixtures
     insert_fixture_without_attachment(fixture, table_name)
   end
   
-  
+  # This is from attachment_fu_fixtures.
+  # http://github.com/mynyml/attachment_fu_fixtures/tree/master
   def attachment_model?(fixture)
     # HABTM join tables generate unnamed fixtures; skip them since they
     # will not include attachments anyway (you'd use HM:T)
