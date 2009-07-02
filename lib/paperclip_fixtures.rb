@@ -1,33 +1,36 @@
 module PaperclipFixtures
-
   # our strategy here is to look at each fixture to see if it has a paperclip
-  # attachment, and if it does, remember the file to use and what attribute
-  # to assign that file to.
+  # attachment, and if it does, remember the attachments and the files for each one.
   #
   # then insert the fixture normally (to get the primary key and associations)
   #
-  # then load the model for the fixture that just got inserted, set the file,
-  # and save it (using AR, not any fixture crapola).
+  # then load the model for the fixture that just got inserted, use a normal setter
+  # for all the attachments, and use a normal save
   #
   # THIS DOESN'T WORK WITH:
-  #  * multiple attachments
   #  * fixtures that don't validate
-  #  * probably lots of other things!
   def insert_fixture_with_attachment(fixture, table_name)
     save_attachment = false
     if klass = attachment_model?(fixture)
-    
-      fixture          = fixture.to_hash
-      key              = fixture.keys.grep(/file_for_/).first
-      full_path        = fixture.delete(key)
-      attachment_field = key.gsub(/file_for_(.*)/, '\1')
+      
+      fixture = fixture.to_hash
+      
+      methods_and_files = {}
+      fixture.keys.each do |key|
+        if key =~ /file_for_/
+          full_path        = fixture.delete(key)
+          attachment_field = key.gsub(/file_for_(.*)/, '\1')
+          save_attachment  = true
+          
+          method = "#{attachment_field}=".to_sym
+          file   = File.new(full_path)
+          
+          methods_and_files[method] = file
+        end
+      end
 
-      # we need these to set the file attribute after inserting the fixture
-      save_attachment = true      
-      file            = File.new(full_path)
-      temp_model      = klass.new()
-      set_method      = "#{attachment_field}=".to_sym
-
+      # now that the attachment data is out of the picture, make a normal fixture
+      temp_model = klass.new()
       fixture = Fixture.new(temp_model.attributes.update(fixture), klass)
     end
     
@@ -40,7 +43,9 @@ module PaperclipFixtures
       id          = fixture[primary_key]
       temp_model  = klass.find(id)
       
-      temp_model.send(set_method, file)
+      methods_and_files.each do |method, file|
+        temp_model.send(method, file)
+      end
       temp_model.save
     end
     return retval
