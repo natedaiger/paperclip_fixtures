@@ -1,8 +1,22 @@
-Hi
+Hi.
 
-This is, as of now, a very dirty, hackish implementation of something like attachment_fu_fixtures for Thoughtbot's Paperclip plugin.
+This does for Paperclip what attachment_fu_fixtures did for attachment_fu.
 
-If for some reason you came across this, you probably shouldn't use it unless you're willing to basically write it yourself. I just needed this for a hackish project so I put little time into it.
+Example:
 
-Inspiration and code from:
+  class Person < ActiveRecord::Base
+    has_attached_file :attractive_photo
+    has_attached_file :unattractive_photo
+  end
+
+You could do a fixture like this:
+
+  frank:
+    name: Frank Stallone
+    file_for_attractive_photo: /home/frank/looking_good.jpg
+    file_for_unattractive_photo: /home/frank/oh_tonight_got_kind_of_weird.jpg
+    
+There you go!
+
+Inspiration and some code code from:
 http://github.com/mynyml/attachment_fu_fixtures/tree/master
