@@ -46,7 +46,7 @@ module PaperclipFixtures
       methods_and_files.each do |method, file|
         temp_model.send(method, file)
       end
-      temp_model.save
+      temp_model.save(false)
     end
     return retval
   end
